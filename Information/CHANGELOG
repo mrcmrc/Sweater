@@ -1,0 +1,74 @@
+  ______                                     
+ / _____)                    _               
+( (____  _ _ _ _____ _____ _| |_ _____  ____ 
+ \____ \| | | | ___ (____ (_   _) ___ |/ ___)
+ _____) ) | | | ____/ ___ | | |_| ____| |    
+(______/ \___/|_____)_____|  \__)_____)_|    
+
+Written by Arthur-N
+
+Legend
+	+ Successfully implemented (tested & fully functional)
+	^ Requires completion (but is functional for the most part)
+	% Requires completion (and is not functional)
+	& Hasn't been implemented yet (Standard Club Penguin protocol)
+	! Hasn't been implemented yet (Custom protocol)
+	@ Won't be implemented.. at least no time soon
+	$ Structural implementation (has been implemented)
+	~ Structural implementation (needs to be implemented)
+	# Structural implementation (requires completion)
+
++ XT & XML packet handling
++ Hashing for the login mechanism
++ Hashing for the game mechanism
++ Server list generation (for the server list at login)
+	+ Caching the server list
++ Waddling
++ Sending messages (includes SafeChat messages)
++ Emotes
++ Actions (dancing, etc)
++ Buddies (includes adding, finding, removing & fetching)
++ Ignores (includes adding, removing & fetching)
++ Room and igloo joining
++ Igloos including upgrades, floors, music, (room) furniture, opening & furniture adding
++ Command handling
++ Adding & updating items
++ Puck moving for the soccer field & ice rink
++ Snowballs
++ Jokes 
++ Tour guide messages
+
+^ Puffles 
+	+ Adoption, having in igloos, puffle-cards, running away, statistics, walking
+	^ Bathing, feeding
+	& Playing with in-game as well as the playing with within the player's igloo (actions)
+
+% Stamp protocol
+
+^ Games 
+	^ Single-player (Hydro Hopper, Catchin' Waves, Astro Barrier, Thin Ice, Puffle Roundup)
+		^ Colors (works on some games)
+		& Game-over packet handling for adding coins
+	& Multi-player (Find Four, Card-Jitsu, Manacala, Sled Racing, Treasure)
+	
+& Digging
+& Newspapers
+
+! Marriage / BFF system (need client)
+! Moods (need client)
+
+$ Trait usage for the handlers as well as the cryptographic methods
+$ File loader changes which include recursive directory loading as well as not needing a trailing slash for specified directories
+$ File loader can skip / ignore files
+$ Process-control implementation (limited only to *NIX platforms)
+	$ No longer using ticks as they are, or may be, deprecated in the near the future
+$ Logger now uses constants for the logging types
+	$ Make use of logging types, perhaps create log files for the logger to write to
+$ Writing retries to prevent data loss (it won't always be prevented, but it's supposed to lessen the amount of times it happens)
+$ Encapsulation for Client data
+$ Using encapsulation for client data
+$ File loader is now gone, we are now using namespaces!
+
+# Make full use of the extended classes of the PDO abstraction layer (GameHandler.php)
+# Make full use of custom exceptions
+# "Plugin" system

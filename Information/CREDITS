@@ -1,0 +1,7 @@
+Credits
+
+sam for help with ClientBase::sendData
+Joee for lots bug testing
+Tybone10 for help with puffles, and for ported postcard handler code
+fluffycoder for tips on the socket back-end
+iCPPS/iCPv3 team because I based a lot of the game and login handling off iCPPS due to the fact that most AS2 stuff is no longer on Club Penguin right now..
