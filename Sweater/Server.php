@@ -11,7 +11,7 @@ class Server extends Silk\ServerBase {
 	
 	public $objDatabase = null;
 	private $objRoomManager;
-	private static $arrPuffleStatistics;
+	private static $arrPuffleStats;
 	
 	function __construct($intServerID, $blnUpdate){
 		$this->readConfiguration($intServerID);
@@ -30,6 +30,7 @@ class Server extends Silk\ServerBase {
 		if($blnUpdate === true){
 			$this->updateCrumbs();
 		}
+		$this->readCrumbs();
 		try {
 			$strAddress = $this->arrConfig['Database']['Address'];
 			$strUsername = $this->arrConfig['Database']['Username'];
@@ -164,6 +165,24 @@ class Server extends Silk\ServerBase {
 		}
 	}
 	
+	function readCrumbs(){
+		$strFloors = file_get_contents('Crumbs/Floors.json');
+		$strFurniture = file_get_contents('Crumbs/Furniture.json');
+		$strIgloos = file_get_contents('Crumbs/Igloos.json');
+		$strItems = file_get_contents('Crumbs/Items.json');
+		$strRooms = file_get_contents('Crumbs/Rooms.json');
+		$arrFloors = json_decode($strFloors, true);
+		$arrFurniture = json_decode($strFurniture, true);
+		$arrIgloos = json_decode($strIgloos, true);
+		$arrItems = json_decode($strItems, true);
+		$arrRooms = json_decode($strRooms, true);
+		$this->arrFloors = $arrFloors;
+		$this->arrFurniture = $arrFurniture;
+		$this->arrIgloos = $arrIgloos;
+		$this->arrItems = $arrItems;
+		self::$arrPuffleStats = $this->arrConfig['Puffles'];
+	}
+	
 	function updateCrumbs(){
 		Silk\Logger::Log('Updating crumbs..');
 		$strFloors = $this->arrConfig['Crumbs']['Floors'];
@@ -271,22 +290,8 @@ class Server extends Silk\ServerBase {
 		$resRooms = fopen('Crumbs/Rooms.json', 'w');
 		fwrite($resRooms, $strJson);
 		fclose($resRooms);
-		$strFloors = file_get_contents('Crumbs/Floors.json');
-		$strFurniture = file_get_contents('Crumbs/Furniture.json');
-		$strIgloos = file_get_contents('Crumbs/Igloos.json');
-		$strItems = file_get_contents('Crumbs/Items.json');
-		$strRooms = file_get_contents('Crumbs/Rooms.json');
-		$arrFloors = json_decode($strFloors, true);
-		$arrFurniture = json_decode($strFurniture, true);
-		$arrIgloos = json_decode($strIgloos, true);
-		$arrItems = json_decode($strItems, true);
-		$arrRooms = json_decode($strRooms, true);
-		$this->arrFloors = $arrFloors;
-		$this->arrFurniture = $arrFurniture;
-		$this->arrIgloos = $arrIgloos;
-		$this->arrItems = $arrItems;
-		self::$arrPuffleStatistics = $this->arrConfig['Puffles'];
 		Silk\Logger::Log('Crumbs updated');
+		$this->readCrumbs();
 	}
 	
 }
