@@ -6,6 +6,7 @@ use Silk;
 // TODO: Perhaps make a private field containing objParent's CPDatabase object
 class Client extends Silk\ClientBase {
 	
+	// TODO: Make these private
 	// NOTICE: Encapsulation is now being used - PLEASE USE THE ENCAPSULATION METHODS
 	// ANOTHER NOTICE: The encapsulation methods are invisisble
 	public $arrInventory; // Item field
@@ -18,10 +19,11 @@ class Client extends Silk\ClientBase {
 	public $intAge; // Player's age field
 	public $intCoins; // Coin field
 	public $intExtRoom, $intIntRoom; // Room information fields
-	public $intPlayer, $strUsername; // Player fields
+	public $intPlayer, $strNickname, $strUsername; // Player fields
 	public $intX, $intY, $intFrame; // Player room detail fields
 	public $intRank; // Rank field
 	
+	private $objGameInstance;
 	private $objDatabase;
 	private $strRandomKey; // Random key field
 	
@@ -95,7 +97,7 @@ class Client extends Silk\ClientBase {
 	function buildPlayerString(){
 		$arrPlayer = [
 			$this->intPlayer,
-			$this->strUsername, 
+			$this->strNickname, 
 			1, // Not exactly sure what this is for, but I think it's a language setting
 			$this->intColor,
 			$this->intHead,
@@ -214,7 +216,7 @@ class Client extends Silk\ClientBase {
 		$this->intPhoto = $arrData['Photo'];
 		$this->intPlayer = $arrData['ID'];
 		$this->intRank = $arrData['Rank'];
-		$this->strUsername = $arrData['Username'];
+		$this->strNickname = $this->strUsername = $arrData['Username'];
 		$intNow = time();
 		$intOld = $arrData['RegisteredTime'];
 		$intSub = $intNow - $intOld;
