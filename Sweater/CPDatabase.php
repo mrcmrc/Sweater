@@ -18,7 +18,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->fetch(\PDO::FETCH_BOUND);
 			$objStatement->closeCursor();
 			return $mixResult;
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -32,7 +32,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->execute();
 			$arrColumns = $objStatement->fetch(\PDO::FETCH_ASSOC);
 			$objStatement->closeCursor();
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 		return $arrColumns;
@@ -65,7 +65,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->bindValue(':Puffle', $intPuffle);
 			$objStatement->execute();
 			$objStatement->closeCursor();
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		} 
 	}
@@ -81,7 +81,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->closeCursor();
 			$arrBuddies = json_decode($strBuddies, true);
 			return $arrBuddies;
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -140,7 +140,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->closeCursor();
 			$arrPostcards = json_decode($strPostcards, true);
 			return $arrPostcards;
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -155,7 +155,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->fetch(\PDO::FETCH_BOUND);
 			$objStatement->closeCursor();
 			return $mixResult;
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -176,7 +176,7 @@ final class CPDatabase extends \PDO {
 				}
 				$strPuffles = substr($strPuffles, 1);
 				return $strPuffles;
-			} catch(PDOException $objException){
+			} catch(\PDOException $objException){
 				Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 			}
 		}
@@ -193,7 +193,7 @@ final class CPDatabase extends \PDO {
 				print_r($arrPuffle);
 				$strPuffle = join('|', $arrPuffle);
 				return $strPuffle;
-			} catch(PDOException $objException){
+			} catch(\PDOException $objException){
 				Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 			}
 		}
@@ -210,7 +210,7 @@ final class CPDatabase extends \PDO {
 				$arrPlayer = $objStatement->fetch(\PDO::FETCH_ASSOC);
 				$objStatement->closeCursor();
 				return $arrPlayer;
-			} catch(PDOException $objException){
+			} catch(\PDOException $objException){
 				Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 			}
 		}
@@ -223,7 +223,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->execute();
 			$arrServers = $objStatement->fetchAll(\PDO::FETCH_ASSOC);
 			$objStatement->closeCursor();
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 		$strServers = '';
@@ -251,7 +251,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->fetch(\PDO::FETCH_BOUND);
 			$objStatement->closeCursor();
 			return $strUsername;
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -266,7 +266,7 @@ final class CPDatabase extends \PDO {
 			$intRows = $objStatement->rowCount();
 			$objStatement->closeCursor();
 			return $intRows > 0;
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -280,7 +280,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->bindValue(':Player', $intPlayer);
 			$objStatement->execute();
 			$objStatement->closeCursor();
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -293,7 +293,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->bindValue(':Postcards', $strPostcards);
 			$objStatement->execute();
 			$objStatement->closeCursor();
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -397,7 +397,7 @@ final class CPDatabase extends \PDO {
 				}
 						
 			}
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -411,7 +411,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->bindValue(':Player', $mixPlayer);
 			$objStatement->execute();
 			$objStatement->closeCursor();
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -424,7 +424,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->bindValue(':Puffle', $intPuffle);
 			$objStatement->execute();
 			$objStatement->closeCursor();
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
@@ -437,7 +437,7 @@ final class CPDatabase extends \PDO {
 			$objStatement->bindValue(':Clients', $intClients);
 			$objStatement->execute();
 			$objStatement->closeCursor();
-		} catch(PDOException $objException){
+		} catch(\PDOException $objException){
 			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
