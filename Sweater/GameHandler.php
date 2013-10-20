@@ -4,6 +4,7 @@
 
 namespace Sweater;
 use Silk;
+use Silk\Exceptions;
 
 trait GameHandler {
 	
@@ -257,6 +258,16 @@ trait GameHandler {
 					$objClient->addFurniture($intFurniture);
 				}
 			break;
+			case 'NICK';
+				if($objClient->getModerator()){
+					list($strUsername) = $arrArguments;
+					$objClient->setNickname($strUsername);
+					$intRoom = $objClient->getExtRoom();
+					$blnIgloo = $intRoom > 1000;
+					$strMethod = $blnIgloo ? 'handleJoinPlayer' : 'handleJoinRoom';
+					$this->$strMethod([4 => $intRoom, 0, 0], $objClient);
+				}
+			break;
 			case 'UI':
 				list($intIgloo) = $arrArguments;
 				$objClient->updateIgloo($intIgloo);
@@ -312,16 +323,25 @@ trait GameHandler {
 		unset($arrData[0]);
 		$arrData = array_values($arrData);
 		array_pop($arrData);
+		$strType = $arrData[1];
 		$strHandler = $arrData[2];
-		if(isset($this->arrXtHandlers[$strHandler])){
-			$strMethod = $this->arrXtHandlers[$strHandler];
-			if(method_exists($this, $strMethod) === false){
-				Silk\Logger::Log('Missing handler for ' . $strMethod . ' (' . $strHandler . ')!', 'WARN');
+		if($strType == 's'){ // Standard packet
+			if(isset($this->arrXtHandlers[$strHandler])){
+				$strMethod = $this->arrXtHandlers[$strHandler];
+				if(method_exists($this, $strMethod) === false){
+					Silk\Logger::Log('Missing standard handler for ' . $strMethod . ' (' . $strHandler . ')!', 'WARN');
+				} else {
+					$this->$strMethod($arrData, $objClient);
+				}
 			} else {
-				$this->$strMethod($arrData, $objClient);
-			}
-		} else {
 			Silk\Logger::Log('Unknown packet received: ' . $strData, 'WARN');
+			}
+		} elseif($strType == 'z'){
+			try {
+				$this->objGameManager->handlePacket($strHandler, $objClient);
+			} catch(Silk\Exceptions\HandlingException $objException){
+				Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
+			}
 		}
 		print_r($arrData);
 		unset($arrData);
@@ -407,21 +427,23 @@ trait GameHandler {
 		$objClient->sendXt('gps', $objClient->getIntRoom(), $strStamps);
 	}
 	
-	// TODO: Check if user exists
 	function handleGetPuffle(Array $arrData, Client $objClient){
 		$intPlayer = $arrData[4];
-		if(is_numeric($intPlayer)){
-			$strPuffles = $this->objDatabase->getPuffles($intPlayer);
-			$objClient->sendXt('pg', $objClient->getIntRoom(), $strPuffles);
+		if($this->objDatabase->playerExists($intPlayer)){
+			if(is_numeric($intPlayer)){
+				$strPuffles = $this->objDatabase->getPuffles($intPlayer);
+				$objClient->sendXt('pg', $objClient->getIntRoom(), $strPuffles);
+			}
 		}
 	}
 	
-	// TODO: Check if user exists
 	function handleGetPuffleUser(Array $arrData, Client $objClient){
 		$intPlayer = isset($arrData[4]) ? $arrData[4] : $objClient->intPlayer; // I don't know
-		if(is_numeric($intPlayer)){
-			$strPuffles = $this->objDatabase->getPuffles($intPlayer);
-			$objClient->sendXt('pgu', $objClient->getIntRoom(), $strPuffles);
+		if($this->objDatabase->playerExists($intPlayer)){
+			if(is_numeric($intPlayer)){
+				$strPuffles = $this->objDatabase->getPuffles($intPlayer);
+				$objClient->sendXt('pgu', $objClient->getIntRoom(), $strPuffles);
+			}
 		}
 	}
 	
@@ -453,7 +475,7 @@ trait GameHandler {
 		$intX = $arrData[5];
 		$intY = $arrData[6];
 		$blnExists = $this->objRoomManager->existsRoom($intRoom);
-	//	if($blnExists === false) return;
+		if($blnExists == false) return;
 		$this->objRoomManager->removeFromRooms($objClient);
 		$this->objRoomManager->addUser($intRoom, $objClient);
 	}
@@ -468,7 +490,7 @@ trait GameHandler {
 		$this->objDatabase->updatePuffleStatistics($objClient->getPlayer(), $objClient);
 		$this->objDatabase->updateColumn($objClient->getPlayer(), 'LastLogin', time());
 		// TODO: add randomization
-		$this->handleJoinRoom(array(4 => 100, 0, 0), $objClient);
+		$this->handleJoinRoom([4 => 100, 0, 0], $objClient);
 	}
 	
 	function handleKick(Array $arrData, Client $objClient){
@@ -513,8 +535,7 @@ trait GameHandler {
 		$intAction = $arrData[5];
 		$objClient->delCoins(10);
 		$this->objRoomManager->sendXt($objClient->getExtRoom(), ['pt', $objClient->getIntRoom(), $objClient->getCoins(), $intPuffle, $intAction]);
-		$this->objDatabase->changePuffleStats($intPuffle, 'Hunger', 10);
-		$this->objDatabase->changePuffleStats($intPuffle, 'Health', 12);
+		$this->handlePuffleStatChange($intPuffle, 'Food');
 		$this->handleGetPuffle([4 => $objClient->getPlayer()], $objClient);
 	}
 	
@@ -573,8 +594,8 @@ trait GameHandler {
 	}
 	
 	function handlePuffleStatChange($intPuffle, $strType){
-		$arrSets = static::$arrPuffleStats[$strType]['Set'];
-		$arrRanges = static::$arrPuffleStats[$strType]['Range'];
+		$arrSets = self::$arrPuffleStats[$strType]['Set'];
+		$arrRanges = self::$arrPuffleStats[$strType]['Range'];
 		foreach($arrSets as $strSet => $intValue){
 			$arrRange = range($arrRanges[$strSet], 100);
 			$intStat = $this->objDatabase->getPuffleColumn($intPuffle, $strSet);
