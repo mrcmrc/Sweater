@@ -72,3 +72,8 @@ $ File loader is now gone, we are now using namespaces!
 # Make full use of the extended classes of the PDO abstraction layer (GameHandler.php)
 # Make full use of custom exceptions
 # "Plugin" system
+
+
+November 8, 2013 3:32 PM
+	* Proper documentation of the change-log begins
+	

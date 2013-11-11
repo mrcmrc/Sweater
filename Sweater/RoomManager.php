@@ -17,7 +17,6 @@ class RoomManager extends Silk\Manager implements Interfaces\StandardRoomManager
 		}
 		$this->arrRooms = $arrRoomData;
 		$intRooms = sizeof($this->arrRooms);
-		$this->intRooms = $intRooms;
 		Silk\Logger::Log('RoomManager initialized - ' . $intRooms . ' rooms');
 	}
 	
@@ -84,6 +83,7 @@ class RoomManager extends Silk\Manager implements Interfaces\StandardRoomManager
 	}
 	
 	public function existsRoom($intRoom){
+		Silk\Logger::Log('Handling room existance check');
 		return isset($this->arrRooms[$intRoom]);
 	}
 	

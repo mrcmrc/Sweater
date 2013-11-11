@@ -61,7 +61,6 @@ abstract class ServerBase {
 				$this->removeClient($resSock);
 			}
 		}
-		unset($arrSockets);
 	}
 	
 	function bindSocket($intPort){

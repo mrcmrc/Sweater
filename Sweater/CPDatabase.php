@@ -329,11 +329,16 @@ final class CPDatabase extends \PDO {
 						$intHealth = $intHealth - mt_rand($intMin, $intMax);
 						$intHunger = $intHunger - mt_rand($intMin, $intMax);
 						$intRest = $intRest - mt_rand($intMin, $intMax);
-						$strHealth = "UPDATE `Puffles` SET Health = $intHealth WHERE ID = :Puffle";
-						$strHunger = "UPDATE `Puffles` SET Hunger = $intHunger WHERE ID = :Puffle";
-						$strRest = "UPDATE `Puffles` SET Rest = $intRest WHERE ID = :Puffle";
+						$strHealth = "UPDATE `Puffles` SET Health = $intHealth WHERE ID = :Puffle;";
+						$strHunger = "UPDATE `Puffles` SET Hunger = $intHunger WHERE ID = :Puffle;";
+						$strRest = "UPDATE `Puffles` SET Rest = $intRest WHERE ID = :Puffle;";
+						$strUpdate = sprintf('%s %s %s', $strHealth, $strHunger, $strRest);
+						$objStatement = $this->prepare($strUpdate);
+						$objStatement->bindValue(':Puffle', $intPuffle);
+						$objStatement->execute();
+						$objStatement->closeCursor();
 						// The following is in the order it is because some drivers may be dicks if closeCursor isn't called before executing another statement
-						$objHealth = $this->prepare($strHealth);
+					/*	$objHealth = $this->prepare($strHealth);
 						$objHealth->bindValue(':Puffle', $intPuffle);
 						$objHealth->execute();
 						$objHealth->closeCursor();
@@ -344,7 +349,7 @@ final class CPDatabase extends \PDO {
 						$objRest = $this->prepare($strRest);
 						$objRest->bindValue(':Puffle', $intPuffle);
 						$objRest->execute();
-						$objRest->closeCursor();
+						$objRest->closeCursor(); */
 					}
 				}
 				$objStatement = $this->prepare($strQuery);

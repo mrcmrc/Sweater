@@ -282,8 +282,6 @@ class Client extends Silk\ClientBase {
 		$this->intCoins -= $intCost;
 		if($this->intExtRoom == $this->intPlayer + 1000){
 			$this->sendData('%xt%au%' . $this->intIntRoom . '%' . $intIgloo . '%' . $this->intCoins . '%');
-			$this->objParent->handleGetIglooDetails([4 => $this->intPlayer], $this);
-			$this->objParent->handleJoinPlayer([4 => $this->intPlayer + 1000], $this); // Automatically re-join the igloo to receive the update
 		}
 	}
 	
