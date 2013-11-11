@@ -28,7 +28,7 @@ class Commands extends BasePlugin {
 	// Over-ride functions
 	
 	public function handleConstruction(){
-		$this->addCustomHandler('m#sm', 'handlePlayerMessage');
+		$this->addCustomXtHandler('m#sm', 'handlePlayerMessage');
 		$this->objBot = $this->objServer->arrPlugins['Bot'];
 	}
 	

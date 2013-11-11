@@ -34,7 +34,7 @@ class Bot extends BasePlugin {
 	// Over-ride functions
 	
 	public function handleConstruction(){
-		$this->addCustomHandler('j#jr', 'handleJoinRoom');
+		$this->addCustomXtHandler('j#jr', 'handleJoinRoom');
 	}
 	
 	private function buildPlayerData(){
