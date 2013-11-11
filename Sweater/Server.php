@@ -2,6 +2,7 @@
 
 namespace Sweater;
 use Sweater\Utils;
+use Sweater\Plugins;
 use Silk;
 use Silk\Exceptions;
 
@@ -10,6 +11,8 @@ class Server extends Silk\ServerBase {
 	use GameHandler, LoginHandler;
 	
 	public $objDatabase = null;
+	public $arrPlugins;
+	
 	private $objRoomManager;
 	private static $arrPuffleStats;
 	
@@ -40,11 +43,17 @@ class Server extends Silk\ServerBase {
 		} catch(\PDOException $objException){
 			throw new Exceptions\StartupException($objException->getMessage());
 		}
+		$this->objDatabase->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
 		if($this->arrServer['Type'] === 'Game'){
 			$this->objRoomManager = new RoomManager();
 			$this->updateStats();
 		} else {
 			$this->handleUpdateServerList();
+		}
+		try {
+			$this->loadPlugins();
+		} catch(Plugins\LoadingException $objException){
+			Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
 		}
 	}
 
@@ -64,6 +73,57 @@ class Server extends Silk\ServerBase {
 			$this->handleGameData($strData, $objClient);
 		}
 		unset($arrData);
+	}
+	
+	public function loadPlugins(){
+		if(!is_dir('Sweater/Plugins')){
+			throw new Plugins\LoadingException('Plugins directory not found');
+		}
+		$arrPluginDirectory = scandir('Sweater/Plugins');
+		foreach($arrPluginDirectory as $strFilename){
+			if($strFilename != '.' && $strFilename != '..'){
+				if(stripos($strFilename, 'Exception') === false){
+					$arrFile = explode('.', $strFilename);
+					$intFile = sizeof($arrFile);
+					unset($arrFile[--$intFile]);
+					list($strPlugin) = $arrFile;
+					if($strPlugin != 'BasePlugin'){
+						$strClass = 'Sweater\Plugins\\' . $strPlugin;
+						$objPlugin = new $strClass($this);
+						if($this->arrServer['Type'] == 'Login' && $objPlugin->blnLogin == false){
+							unset($objPlugin);
+						} else {
+							$this->arrPlugins[$strPlugin] = $objPlugin;
+						}
+					}
+				}
+			}
+		}
+		if(!empty($this->arrPlugins)){
+			foreach($this->arrPlugins as $strPlugin=>$objPlugin){
+				$arrDependencies = $objPlugin->getDependencies();
+				foreach($arrDependencies as $strDependency){
+					if(!array_key_exists($strDependency, $this->arrPlugins)){
+						Silk\Logger::Log('Plugin \'' . $strPlugin . '\' will not be loaded - missing dependency \'' . $strDependency . '\'', Silk\Logger::Warn);
+						unset($this->arrPlugins[$strPlugin]);
+					}
+				}
+			}
+			foreach($this->arrPlugins as $objPlugin){
+				if($objPlugin->blnConstructor){
+					$objPlugin->handleConstruction();
+				}
+			}
+		}
+		$intPlugins = sizeof($this->arrPlugins);
+		if($intPlugins == 0){
+			Silk\Logger::Log('No plugins loaded');
+		} else {
+			$arrPlugins = array_keys($this->arrPlugins);
+			$blnPlugins = $intPlugins > 1; // More than one?
+			$strPlugin = $blnPlugins ? 'plugins' : 'plugin';
+			Silk\Logger::Log($intPlugins . ' ' . $strPlugin . ' loaded (' . implode(', ', $arrPlugins) . ')');
+		}
 	}
 	
 	function handleSignal($intSignal){
@@ -101,17 +161,7 @@ class Server extends Silk\ServerBase {
 		}
 		exit();
 	}
-	
-	function handleServerStatus(){
-		Silk\Logger::Log('Ticking seems to be working!');
-	}
-	
-	function updateStats(){
-		$intServer = $this->arrServer['ID'];
-		$intClients = sizeof($this->arrClients);
-		$this->objDatabase->updateStats($intServer, $intClients);
-	}
-	
+
 	function registerSignals($arrSignals, $arrCallback){
 		if(!is_array($arrSignals)) return;
 		if(empty($arrSignals)) return;
@@ -292,6 +342,12 @@ class Server extends Silk\ServerBase {
 		fclose($resRooms);
 		Silk\Logger::Log('Crumbs updated');
 		$this->readCrumbs();
+	}
+	
+	function updateStats(){
+		$intServer = $this->arrServer['ID'];
+		$intClients = sizeof($this->arrClients);
+		$this->objDatabase->updateStats($intServer, $intClients);
 	}
 	
 }

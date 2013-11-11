@@ -235,46 +235,6 @@ trait GameHandler {
 		}
 	}
 	
-	function handleCommand($strCommand, $arrArguments, Client $objClient){
-		$strCommand = strtoupper($strCommand);
-		Silk\Logger::Log('Handling command \'' . $strCommand . '\'');
-		switch($strCommand){
-			case 'AC':
-				list($intCoins) = $arrArguments;
-				if(is_numeric($intCoins) && $intCoins < 5001 && $objClient->intCoins < 1000000){
-					$objClient->addCoins($intCoins);
-					$objClient->sendXt('zo', $objClient->getIntRoom(), $objClient->getCoins());
-				}
-			break;
-			case 'AI':
-				list($intItem) = $arrArguments;
-				if(isset($this->arrItems[$intItem])){
-					$objClient->addItem($intItem);
-				}
-			break;
-			case 'AF':
-				list($intFurniture) = $arrArguments;
-				if(isset($this->arrFurniture[$intFurniture])){
-					$objClient->addFurniture($intFurniture);
-				}
-			break;
-			case 'NICK';
-				if($objClient->getModerator()){
-					list($strUsername) = $arrArguments;
-					$objClient->setNickname($strUsername);
-					$intRoom = $objClient->getExtRoom();
-					$blnIgloo = $intRoom > 1000;
-					$strMethod = $blnIgloo ? 'handleJoinPlayer' : 'handleJoinRoom';
-					$this->$strMethod([4 => $intRoom, 0, 0], $objClient);
-				}
-			break;
-			case 'UI':
-				list($intIgloo) = $arrArguments;
-				$objClient->updateIgloo($intIgloo);
-			break;
-		}
-	}
-	
 	function handleDeleteMail(Array $arrData, Client $objClient){
 		$intPostcard = $arrData[4]; // The postcard's unique ID
 		$arrPostcards = $objClient->arrPostcards;
@@ -329,18 +289,19 @@ trait GameHandler {
 			if(isset($this->arrXtHandlers[$strHandler])){
 				$strMethod = $this->arrXtHandlers[$strHandler];
 				if(method_exists($this, $strMethod) === false){
-					Silk\Logger::Log('Missing standard handler for ' . $strMethod . ' (' . $strHandler . ')!', 'WARN');
+					Silk\Logger::Log('Missing standard handler for ' . $strMethod . ' (' . $strHandler . ')!', Silk\Logger::Warn);
 				} else {
-					$this->$strMethod($arrData, $objClient);
+					call_user_func([$this, $strMethod], $arrData, $objClient);
 				}
 			} else {
-			Silk\Logger::Log('Unknown packet received: ' . $strData, 'WARN');
+			Silk\Logger::Log('Unknown packet received: ' . $strData, Silk\Logger::Warn);
 			}
 		} elseif($strType == 'z'){
-			try {
-				$this->objGameManager->handlePacket($strHandler, $objClient);
-			} catch(Silk\Exceptions\HandlingException $objException){
-				Silk\Logger::Log($objException->getMessage(), Silk\Logger::Warn);
+			Silk\Logger::Log('Game packet received: ' . $strData, Silk\Logger::Debug);
+		}
+		foreach($this->arrPlugins as $objPlugin){
+			if($objPlugin->blnGame){
+				$objPlugin->handleGamePacket([$arrData, $objClient]);
 			}
 		}
 		print_r($arrData);
@@ -521,7 +482,6 @@ trait GameHandler {
 		}
 	}
 	
-	// Bathing doesn't work (the animation) - at least for my client
 	function handlePuffleBath(Array $arrData, Client $objClient){
 		$intPuffle = $arrData[4];
 		$objClient->delCoins(5);
@@ -543,8 +503,7 @@ trait GameHandler {
 		$intPuffle = $arrData[4];
 		$objClient->delCoins(10);
 		$this->objRoomManager->sendXt($objClient->getExtRoom(), ['pf', $objClient->getIntRoom(), $objClient->getCoins(), $intPuffle]);
-		$this->objDatabase->changePuffleStats($intPuffle, 'Hunger', 9);
-		$this->objDatabase->changePuffleStats($intPuffle, 'Health', 12);
+		$this->objDatabase->handlePuffleStatChange($intPuffle, 'Food');
 		$this->handleGetPuffle([4 => $objClient->getPlayer()], $objClient);
 	}
 	
@@ -689,22 +648,6 @@ trait GameHandler {
 	
 	function handleSendMessage(Array $arrData, Client $objClient){
 		$strMessage = $arrData[5];
-		$blnCommand = substr($strMessage, 0, 1) == '!';
-		if($blnCommand){
-			$strStripped = substr($strMessage, 1);
-			$blnArguments = strpos($strStripped, ' ') > -1;
-			$arrArguments = [];
-			if($blnArguments){
-				$arrArguments = explode(' ', $strStripped);
-				$strCommand = $arrArguments[0];
-				unset($arrArguments[0]);
-				$arrArguments = array_values($arrArguments);
-				unset($arrFixed);
-			} else {
-				$strCommand = $strStripped;
-			}
-			$this->handleCommand($strCommand, $arrArguments, $objClient);
-		}
 		$this->objRoomManager->sendXt($objClient->getExtRoom(), ['sm', $objClient->getIntRoom(), $objClient->getPlayer(), $strMessage]);
 	}
 	

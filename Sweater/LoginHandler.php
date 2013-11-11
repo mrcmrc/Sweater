@@ -133,6 +133,9 @@ trait LoginHandler {
 				}
 				$this->$strMethod($arrData, $objClient);
 			}
+			foreach($this->arrPlugins as $objPlugin){
+				$objPlugin->handleLoginPacket([$arrData, $objClient]);
+			}
 		}
 	}
 	
