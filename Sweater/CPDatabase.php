@@ -337,19 +337,6 @@ final class CPDatabase extends \PDO {
 						$objStatement->bindValue(':Puffle', $intPuffle);
 						$objStatement->execute();
 						$objStatement->closeCursor();
-						// The following is in the order it is because some drivers may be dicks if closeCursor isn't called before executing another statement
-					/*	$objHealth = $this->prepare($strHealth);
-						$objHealth->bindValue(':Puffle', $intPuffle);
-						$objHealth->execute();
-						$objHealth->closeCursor();
-						$objHunger = $this->prepare($strHunger);
-						$objHunger->bindValue(':Puffle', $intPuffle);
-						$objHunger->execute();
-						$objHunger->closeCursor();
-						$objRest = $this->prepare($strRest);
-						$objRest->bindValue(':Puffle', $intPuffle);
-						$objRest->execute();
-						$objRest->closeCursor(); */
 					}
 				}
 				$objStatement = $this->prepare($strQuery);
