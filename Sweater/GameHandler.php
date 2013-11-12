@@ -8,15 +8,20 @@ use Silk\Exceptions;
 
 trait GameHandler {
 	
+	use InventoryHandler;
+	
 	public $arrXtHandlers = [
+		// EPFHandler
 		'f#epfga' => 'handleEPFGetAgentStatus',
 		'f#epfgf' => 'handleEPFGetFieldOpStatus',
 		'f#epfgr' => 'handleEPFGetPoints',
+		// BuddyHandler
 		'b#ba' => 'handleBuddyAccept',
 		'b#bf' => 'handleBuddyFind',
 		'b#br' => 'handleBuddyRequest',
 		'b#gb' => 'handleGetBuddies',
 		'b#rb' => 'handleBuddyRemove',
+		// IglooHandler
 		'g#af' => 'handleAddFurniture',
 		'g#ag' => 'handleUpdateFloor',
 		'g#au' => 'handleUpdateIglooType',
@@ -28,23 +33,30 @@ trait GameHandler {
 		'g#or' => 'handleOpenIgloo',
 		'g#um' => 'handleUpdateMusic',
 		'g#ur' => 'handleSaveIglooFurniture',
+		// InventoryHandler
 		'i#ai' => 'handleAddItem',
-		'i#gi' => 'handleGetItems',
+		'i#gi' => 'handleGetItems', 
 		'i#qpa' => 'handleQueryPlayersAwards',
 		'i#qpp' => 'handleQueryPlayersPins',
+		// NavigationHandler
 		'j#jp' => 'handleJoinPlayer',
 		'j#jr' => 'handleJoinRoom',
 		'j#js' => 'handleJoinServer',
+		// MailHandler
 		'l#md' => 'handleDeleteMail',
 		'l#mdp' => 'handleDeleteMailPlayer',
 		'l#mg' => 'handleGetMail',
 		'l#ms' => 'handleSendMail',
 		'l#mst' => 'handleStartMail', // This is received when a user first joins the server
+		// MessageHandler
 		'm#sm' => 'handleSendMessage',
+		// IgnoreHandler
 		'n#an' => 'handleAddIgnore', 
 		'n#rn' => 'handleRemoveIgnore',
 		'n#gn' => 'handleGetIgnoreList',
+		// ModerationHandler
 		'o#k' => 'handleKick',
+		// PuffleHandler
 		'p#pip' => 'handlePufflePip',
 		'p#pir' => 'handlePufflePir',
 		'p#ir' => 'handlePuffleIsResting',
@@ -61,6 +73,7 @@ trait GameHandler {
 		'p#pgu' => 'handleGetPuffleUser',
 		'p#pm' => 'handlePuffleMove',
 		'p#pn' => 'handleAdoptPuffle',
+		// Standard/System?
 		's#upc'	=>	'handleUpdatePlayerArt',
 		's#uph'	=>	'handleUpdatePlayerArt',
 		's#upf'	=>	'handleUpdatePlayerArt',
@@ -70,10 +83,13 @@ trait GameHandler {
 		's#upe'	=>	'handleUpdatePlayerArt',
 		's#upl'	=>	'handleUpdatePlayerArt',
 		's#upp'	=>	'handleUpdatePlayerArt',
+		// StampHandler
 		'st#gps' => 'handleGetPlayersStamps',
 		'st#gsbcd' => 'handleGetStampBookCoverDetails',
+		// ToyHandler
 		't#at' => 'handleAddToy',
 		't#rt' => 'handleRemoveToy',
+		// PlayerHandler
 		'u#h' => 'handleHeartBeat',
 		'u#glr' => 'handleGetLatestRevision',
 		'u#gp' => 'handleGetPlayer',
@@ -85,6 +101,7 @@ trait GameHandler {
 		'u#sj' => 'handleSendJoke',
 		'u#sp' => 'handleSendPosition',
 		'u#ss' => 'handleSendSafeMessage',
+		// MinigameHandler
 		'gz' => 'handleGameStatus',
 		'm' => 'handleMovePuck'
 	];
@@ -110,11 +127,6 @@ trait GameHandler {
 			return $objClient->sendError(410);
 		}
 		$objClient->addFurniture($intFurniture);
-	}
-		
-	function handleAddItem(Array $arrData, Client $objClient){
-		$intItem = $arrData[4];
-		$objClient->addItem($intItem);
 	}
 	
 	function handleAddIgnore(Array $arrData, Client $objClient){
@@ -354,11 +366,6 @@ trait GameHandler {
 		$objClient->sendXt('gn', -1, $strIgnore);
 	}
 	
-	function handleGetItems(Array $arrData, Client $objClient){
-		$strItems = $objClient->getItems();
-		$objClient->sendXt('gi', -1, $strItems);
-	}
-	
 	function handleGetLatestRevision(Array $arrData, Client $objClient){
 		$objClient->sendXt('glr', -1, 4815); // I don't know what these numbers are for, so feel free to change em up
 	}
@@ -564,19 +571,6 @@ trait GameHandler {
 				$this->objDatabase->changePuffleStats($intPuffle, $strSet, $intValue);
 			}
 		}
-	}
-	
-	// TODO: Implement actually getting player's awards
-	function handleQueryPlayersAwards(Array $arrData, Client $objClient){
-		$strAwards = '';
-		$objClient->sendXt('qpa', -1, $strAwards);
-	}
-	
-	// TODO: Implement actually getting player's pins
-	function handleQueryPlayersPins(Array $arrData, Client $objClient){
-		$intPlayer = $arrData[4];
-		$strPins = '';
-		$objClient->sendXt('qpp', -1, $strPins);
 	}
 	
 	function handleRemoveIgnore(Array $arrData, Client $objClient){

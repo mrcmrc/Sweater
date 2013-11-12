@@ -82,7 +82,7 @@ class Server extends Silk\ServerBase {
 		$arrPluginDirectory = scandir('Sweater/Plugins');
 		foreach($arrPluginDirectory as $strFilename){
 			if($strFilename != '.' && $strFilename != '..'){
-				if(stripos($strFilename, 'Exception') === false){
+				if(stripos($strFilename, 'Exception') === false && stripos($strFilename, 'Interface') === false){
 					$arrFile = explode('.', $strFilename);
 					$intFile = sizeof($arrFile);
 					unset($arrFile[--$intFile]);

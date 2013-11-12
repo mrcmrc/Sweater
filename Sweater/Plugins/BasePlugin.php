@@ -3,7 +3,7 @@
 namespace Sweater\Plugins;
 use Sweater;
 
-abstract class BasePlugin {
+abstract class BasePlugin implements Interfaces\PluginInterface {
 	
 	private $arrXtHandlers = []; // Method mapping
 	private $arrXMLHandlers = []; // Method mapping
