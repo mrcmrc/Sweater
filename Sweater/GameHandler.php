@@ -5,10 +5,11 @@
 namespace Sweater;
 use Silk;
 use Silk\Exceptions;
+use Sweater\Handlers;
 
 trait GameHandler {
 	
-	use InventoryHandler;
+	use Handlers\Inventory;
 	
 	public $arrXtHandlers = [
 		// EPFHandler
@@ -35,9 +36,7 @@ trait GameHandler {
 		'g#ur' => 'handleSaveIglooFurniture',
 		// InventoryHandler
 		'i#ai' => 'handleAddItem',
-		'i#gi' => 'handleGetItems', 
-		'i#qpa' => 'handleQueryPlayersAwards',
-		'i#qpp' => 'handleQueryPlayersPins',
+		'i#gi' => 'handleGetItems',
 		// NavigationHandler
 		'j#jp' => 'handleJoinPlayer',
 		'j#jr' => 'handleJoinRoom',
